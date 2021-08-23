@@ -16,7 +16,8 @@ dispatcher = updater.dispatcher
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text='Пришли мне фото!')
+                             text='Добро пожаловать, набери /info, чтобы '
+                                  'получить информацию')
 
 
 def message(update, context):
@@ -26,7 +27,14 @@ def message(update, context):
                              text='Теперь пришли мне фото!')
 
 
-def photo_handler(update, context):
+def info(update, context):
+    message_text = 'Бот может добавить текст на твои фото! \n\n Сначала ' \
+                   'напиши текст, потом отправь фото! '
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text=message_text)
+
+
+def photo(update, context):
     file = update.message.photo[-1].get_file()
     try:
         text = context.user_data['text']
@@ -47,12 +55,12 @@ def photo_handler(update, context):
 def main():
     while True:
         start_handler = CommandHandler('start', start)
-
-        image_handler = MessageHandler(Filters.photo, photo_handler)
+        info_handler = CommandHandler('info', info)
+        image_handler = MessageHandler(Filters.photo, photo)
         text_handler = MessageHandler(Filters.text, message)
         dispatcher.add_handler(start_handler)
         dispatcher.add_handler(image_handler)
-
+        dispatcher.add_handler(info_handler)
         dispatcher.add_handler(text_handler)
         updater.start_polling()
         updater.idle()
